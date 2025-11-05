@@ -1,0 +1,10 @@
+# ignore npm and venv stuff
+node_modules/
+venv/
+__pycache__/
+*.pyc
+
+# ignore environment files
+.env
+.env.local
+.env.*.local

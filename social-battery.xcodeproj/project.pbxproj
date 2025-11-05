@@ -6,6 +6,11 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		041043632EBB19D2007C8361 /* Authenticator in Frameworks */ = {isa = PBXBuildFile; productRef = 041043622EBB19D2007C8361 /* Authenticator */; };
+		041043662EBB1A6F007C8361 /* Amplify in Frameworks */ = {isa = PBXBuildFile; productRef = 041043652EBB1A6F007C8361 /* Amplify */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		041043362EBB16FD007C8361 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -52,6 +57,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				041043632EBB19D2007C8361 /* Authenticator in Frameworks */,
+				041043662EBB1A6F007C8361 /* Amplify in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -112,6 +119,8 @@
 			);
 			name = "social-battery";
 			packageProductDependencies = (
+				041043622EBB19D2007C8361 /* Authenticator */,
+				041043652EBB1A6F007C8361 /* Amplify */,
 			);
 			productName = "social-battery";
 			productReference = 041043282EBB16FA007C8361 /* social-battery.app */;
@@ -195,6 +204,10 @@
 			);
 			mainGroup = 0410431F2EBB16FA007C8361;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				041043612EBB19D2007C8361 /* XCRemoteSwiftPackageReference "amplify-ui-swift-authenticator" */,
+				041043642EBB1A6F007C8361 /* XCRemoteSwiftPackageReference "amplify-swift" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 041043292EBB16FA007C8361 /* Products */;
 			projectDirPath = "";
@@ -418,13 +431,14 @@
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = auto;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2,7";
+				TARGETED_DEVICE_FAMILY = "1,2";
 				XROS_DEPLOYMENT_TARGET = 26.1;
 			};
 			name = Debug;
@@ -462,13 +476,14 @@
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = auto;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2,7";
+				TARGETED_DEVICE_FAMILY = "1,2";
 				XROS_DEPLOYMENT_TARGET = 26.1;
 			};
 			name = Release;
@@ -615,6 +630,38 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		041043612EBB19D2007C8361 /* XCRemoteSwiftPackageReference "amplify-ui-swift-authenticator" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/aws-amplify/amplify-ui-swift-authenticator";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.2.3;
+			};
+		};
+		041043642EBB1A6F007C8361 /* XCRemoteSwiftPackageReference "amplify-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/aws-amplify/amplify-swift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.51.4;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		041043622EBB19D2007C8361 /* Authenticator */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 041043612EBB19D2007C8361 /* XCRemoteSwiftPackageReference "amplify-ui-swift-authenticator" */;
+			productName = Authenticator;
+		};
+		041043652EBB1A6F007C8361 /* Amplify */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 041043642EBB1A6F007C8361 /* XCRemoteSwiftPackageReference "amplify-swift" */;
+			productName = Amplify;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 041043202EBB16FA007C8361 /* Project object */;
 }
