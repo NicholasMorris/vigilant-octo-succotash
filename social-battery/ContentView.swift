@@ -43,15 +43,15 @@ struct ContentView: View {
             .sheet(isPresented: $showingSettings) { SettingsView(store: store) }
             .background(Color(.systemGroupedBackground).ignoresSafeArea())
         }
-//        Authenticator { state in
-//                    VStack {
-//                        Button("Sign out") {
-//                            Task {
-//                                await state.signOut()
-//                            }
-//                        }
-//                    }
-//        }
+        Authenticator { state in
+                    VStack {
+                        Button("Sign out") {
+                            Task {
+                                await state.signOut()
+                            }
+                        }
+                    }
+        }
     }
 
     private var header: some View {
