@@ -9,54 +9,63 @@ import SwiftUI
 import Amplify
 import Authenticator
 
+struct AuthFlow: View {
+    var body: some View {
+        Authenticator { state in
+            VStack {
+                Button("Sign out") {
+                    Task {
+                        await state.signOut()
+                    }
+                }
+            }
+        }
+    }
+}
+
 struct SettingsView: View {
     @ObservedObject var store: SocialBatteryStore
     @Environment(\.dismiss) private var dismiss
     @StateObject private var vm = UserViewModel()
-
+    
     @State private var selection: Int = 0 // 0=weekends, 1=weekdays, 2=custom
     @State private var customDays: Set<Int> = []
     @State private var times: Int = 1
     @State private var per: Int = 1 // 1=week, 2=month
     @State private var email: String?
-
+    @State private var showSignin: Bool = false
+    
     var body: some View {
         NavigationStack {
             Form {
-                Authenticator { state in
-                    Text("Hello, \(state.user.username)")
-                    Text("\(state.user.userId)")
-                    Text("\(email ?? "")")
+                Section("Profile") {
                     if vm.isLoading {
-                                    ProgressView("Loading…")
-                    } else if let signedIn = vm.signedIn {
+                        ProgressView("Loading…")
+                    } else if let _ = vm.signedIn {
                         if let email = vm.email {
                             Text("Email: \(email)")
                         } else if let error = vm.error {
+                            Button(action: { showSignin = true }) {
+                                Text("Sign In")
+                            }
                             Text(error)
                                 .foregroundColor(.red)
                         }
-//                    } else {
-                        Authenticator { state in
-                                    VStack {
-                                        Button("Sign out") {
-                                            Task {
-                                                await state.signOut()
-                                            }
-                                        }
-                                    }
+//                        AuthFlow()
+                    } else {
+                        
+                    }
+                    Button("Fetch Attributes") {
+                        Task {
+                            do {
+                                let userAttributes = try await Amplify.Auth.fetchUserAttributes()
+                                print(userAttributes[0].value)
+                            } catch {
+                                print("Failed to fetch attributes:", error)
+                            }
                         }
                     }
-                }
-                Button("Fetch Attributes") {
-                    Task {
-                        do {
-                            let userAttributes = try await Amplify.Auth.fetchUserAttributes()
-                            print(userAttributes[0].value)
-                        } catch {
-                            print("Failed to fetch attributes:", error)
-                        }
-                    }
+
                 }
                 Section("Availability") {
                     Picker("Preset", selection: $selection) {
@@ -65,7 +74,7 @@ struct SettingsView: View {
                         Text("Custom").tag(2)
                     }
                     .pickerStyle(.segmented)
-
+                    
                     if selection == 2 {
                         WeekdayPicker(selection: $customDays)
                         Text("Choose one or more days")
@@ -73,7 +82,7 @@ struct SettingsView: View {
                             .foregroundStyle(.secondary)
                     }
                 }
-
+                
                 Section("Frequency") {
                     Stepper("Times: \(times)", value: $times, in: 1...7)
                     Picker("Per", selection: $per) {
@@ -100,6 +109,7 @@ struct SettingsView: View {
                     }
                 }
             }
+            .sheet(isPresented: $showSignin) { AuthFlow() }
             .onAppear {
                 // hydrate UI from store
                 switch store.availability.allowedWeekdays.sorted() {
@@ -117,8 +127,8 @@ struct SettingsView: View {
                 }
             }
             .task {      // <-- SwiftUI waits and re-renders when done
-                        await vm.loadUserAttributes()
-                    }
+                await vm.loadUserAttributes()
+            }
         }
     }
 }
@@ -126,7 +136,7 @@ struct SettingsView: View {
 private struct WeekdayPicker: View {
     @Binding var selection: Set<Int>
     private let symbols = Calendar.current.veryShortWeekdaySymbols
-
+    
     var body: some View {
         HStack(spacing: 8) {
             ForEach(1...7, id: \.self) { day in
