@@ -61,13 +61,19 @@ public struct Friend: Identifiable, Equatable, Codable, Sendable {
     public var color: ColorCodable
     public var lastMet: Date?
     public var maxFrequency: FrequencyLimit?
+    // optional battery level published by the friend (0-100). If nil, compute locally.
+    public var batteryLevel: Int?
+    // optional owner email/id for remote friends. Used to publish/lookup battery in backend.
+    public var ownerEmail: String?
 
-    public init(id: UUID = UUID(), name: String, color: Color = .blue, lastMet: Date? = nil, maxFrequency: FrequencyLimit? = nil) {
+    public init(id: UUID = UUID(), name: String, color: Color = .blue, lastMet: Date? = nil, maxFrequency: FrequencyLimit? = nil, batteryLevel: Int? = nil, ownerEmail: String? = nil) {
         self.id = id
         self.name = name
         self.color = ColorCodable(color)
         self.lastMet = lastMet
         self.maxFrequency = maxFrequency
+        self.batteryLevel = batteryLevel
+        self.ownerEmail = ownerEmail
     }
 
     public var initials: String {

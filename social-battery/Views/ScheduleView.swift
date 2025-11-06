@@ -23,7 +23,7 @@ struct ScheduleSheet: View {
                 ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Save") {
-                        store.recordMeeting(with: friend.id, on: date)
+                        store.scheduleMeeting(with: friend.id, on: date)
                         dismiss()
                     }
                 }

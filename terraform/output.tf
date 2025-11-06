@@ -21,3 +21,8 @@ output "aws_region" {
   value       = "ap-southeast-2"
   sensitive   = true
 }
+
+output "api_endpoint" {
+  description = "HTTP API endpoint for the Connections API"
+  value       = aws_apigatewayv2_api.http_api.api_endpoint
+}

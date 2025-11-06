@@ -6,12 +6,15 @@
 //
 
 import SwiftUI
+import Amplify
+import AWSCognitoAuthPlugin
 
 struct ContentView: View {
     @StateObject private var store = SocialBatteryStore()
     @State private var showingAddFriend = false
     @State private var selectedFriendForSchedule: Friend? = nil
     @State private var showingSettings = false
+        @State private var showingFriendRequests = false
 
     var body: some View {
         NavigationStack {
@@ -26,9 +29,14 @@ struct ContentView: View {
             .navigationTitle("Social Battery")
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Button(action: { showingSettings = true }) {
-                        Image(systemName: "gearshape")
-                    }
+                        HStack {
+                            Button(action: { showingSettings = true }) {
+                                Image(systemName: "gearshape")
+                            }
+                            Button(action: { showingFriendRequests = true }) {
+                                Image(systemName: "person.2.fill")
+                            }
+                        }
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button(action: { showingAddFriend = true }) {
@@ -37,6 +45,7 @@ struct ContentView: View {
                 }
             }
             .sheet(isPresented: $showingAddFriend) { AddFriendSheet(store: store) }
+                .sheet(isPresented: $showingFriendRequests) { FriendRequestsView(store: store) }
             .sheet(item: $selectedFriendForSchedule) { friend in ScheduleSheet(friend: friend, store: store) }
             .sheet(isPresented: $showingSettings) { SettingsView(store: store) }
             .background(Color(.systemGroupedBackground).ignoresSafeArea())
@@ -111,13 +120,21 @@ private struct AddFriendSheet: View {
     @State private var perFriendLimit: Bool = false
     @State private var times: Int = 1
     @State private var per: Int = 1 // 1=week, 2=month
+    @State private var email: String = ""
+    @State private var preferences: String = ""
 
     var body: some View {
         NavigationStack {
             Form {
                 Section("Details") {
-                    TextField("Name", text: $name)
+                    TextField("Name or display", text: $name)
+                    TextField("Friend email", text: $email)
+                        .keyboardType(.emailAddress)
+                        .textContentType(.emailAddress)
                     ColorPicker("Color", selection: $color, supportsOpacity: false)
+                }
+                Section("Preferences (optional)") {
+                    TextField("Preferences (availability, notes)", text: $preferences)
                 }
                 Section("Per-friend limit (optional)") {
                     Toggle("Enable", isOn: $perFriendLimit)
@@ -135,12 +152,23 @@ private struct AddFriendSheet: View {
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Add") {
-                        let limit: FrequencyLimit? = perFriendLimit ? (per == 1 ? .timesPerWeek(times) : .timesPerMonth(times)) : nil
-                        store.addFriend(name: name.isEmpty ? "Friend" : name, color: color, maxFrequency: limit)
-                        dismiss()
+                    Button("Send Request") {
+                        // attempt to fetch sender email from Amplify Auth attributes; fall back to name
+                        Task {
+                            var sender = name
+                            do {
+                                let attrs = try await Amplify.Auth.fetchUserAttributes()
+                                if let emailAttr = attrs.first(where: { $0.key.rawValue == "email" }) {
+                                    sender = emailAttr.value
+                                }
+                            } catch {
+                                // ignore
+                            }
+                            store.sendConnectionRequest(senderEmail: sender, receiverEmail: email, preferences: preferences.isEmpty ? nil : preferences)
+                            dismiss()
+                        }
                     }
-                    .disabled(name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                    .disabled(email.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 }
             }
         }
