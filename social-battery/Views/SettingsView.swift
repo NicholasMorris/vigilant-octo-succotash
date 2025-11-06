@@ -6,19 +6,58 @@
 //
 
 import SwiftUI
+import Amplify
+import Authenticator
 
 struct SettingsView: View {
     @ObservedObject var store: SocialBatteryStore
     @Environment(\.dismiss) private var dismiss
+    @StateObject private var vm = UserViewModel()
 
     @State private var selection: Int = 0 // 0=weekends, 1=weekdays, 2=custom
     @State private var customDays: Set<Int> = []
     @State private var times: Int = 1
     @State private var per: Int = 1 // 1=week, 2=month
+    @State private var email: String?
 
     var body: some View {
         NavigationStack {
             Form {
+                Authenticator { state in
+                    Text("Hello, \(state.user.username)")
+                    Text("\(state.user.userId)")
+                    Text("\(email ?? "")")
+                    if vm.isLoading {
+                                    ProgressView("Loading…")
+                    } else if let signedIn = vm.signedIn {
+                        if let email = vm.email {
+                            Text("Email: \(email)")
+                        } else if let error = vm.error {
+                            Text(error)
+                                .foregroundColor(.red)
+                        }
+//                    } else {
+                        Authenticator { state in
+                                    VStack {
+                                        Button("Sign out") {
+                                            Task {
+                                                await state.signOut()
+                                            }
+                                        }
+                                    }
+                        }
+                    }
+                }
+                Button("Fetch Attributes") {
+                    Task {
+                        do {
+                            let userAttributes = try await Amplify.Auth.fetchUserAttributes()
+                            print(userAttributes[0].value)
+                        } catch {
+                            print("Failed to fetch attributes:", error)
+                        }
+                    }
+                }
                 Section("Availability") {
                     Picker("Preset", selection: $selection) {
                         Text("Weekends").tag(0)
@@ -77,6 +116,9 @@ struct SettingsView: View {
                     per = 2; times = n
                 }
             }
+            .task {      // <-- SwiftUI waits and re-renders when done
+                        await vm.loadUserAttributes()
+                    }
         }
     }
 }

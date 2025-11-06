@@ -6,8 +6,6 @@
 //
 
 import SwiftUI
-import Amplify
-import Authenticator
 
 struct ContentView: View {
     @StateObject private var store = SocialBatteryStore()
@@ -43,15 +41,7 @@ struct ContentView: View {
             .sheet(isPresented: $showingSettings) { SettingsView(store: store) }
             .background(Color(.systemGroupedBackground).ignoresSafeArea())
         }
-        Authenticator { state in
-                    VStack {
-                        Button("Sign out") {
-                            Task {
-                                await state.signOut()
-                            }
-                        }
-                    }
-        }
+        
     }
 
     private var header: some View {
